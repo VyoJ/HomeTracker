@@ -1,4 +1,5 @@
-import { revalidatePath } from "next/cache";
+"use client";
+
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
 import {
@@ -9,63 +10,49 @@ import {
   Select,
 } from "@/components/ui/select";
 import { Button } from "@/components/ui/button";
-
-import { z } from "zod";
-
-import { db } from "@/drizzle/config";
-import { items } from "@/drizzle/schema";
-import { redirect } from "next/navigation";
-
-const schema = z.object({
-  name: z.string().min(1),
-  qty: z.string().min(1),
-  category: z.string().min(1),
-});
+import { createItem } from "../actions";
+import { useRouter } from "next/navigation";
+import { useToast } from "@/components/ui/use-toast";
 
 function CreateItem() {
-  const createItem = async (formData: FormData) => {
-    "use server";
+  const router = useRouter();
+  const { toast } = useToast();
 
-    const validated = schema.parse({
-      name: formData.get("name"),
-      qty: formData.get("qty"),
-      category: formData.get("category"),
-    });
-
-    try {
-      await db.insert(items).values({
-        name: validated.name,
-        qty: validated.qty,
-        category: validated.category,
+  async function onSubmit(formdata: FormData) {
+    let res = await createItem(formdata);
+    console.log(res);
+    if (res.status === 200) {
+      toast({
+        title: "Item created successfully",
+        description: "Redirecting to pantry page",
       });
-
-      revalidatePath("/pantry");
-      redirect("/pantry");
-      return {
-        message: "Item added successfully!",
-        revalidated: true,
-        now: Date.now(),
-      };
-    } catch (error) {
-      return {
-        message: "Something went wrong when creating the item!",
-      };
+      router.push("/pantry");
+    } else {
+      toast({
+        title: "Item could not be created successfully",
+        description: res.message,
+        variant: "destructive",
+      });
     }
-  };
+  }
+
   return (
     <div className="container mx-auto px-4 py-6">
       <div className="w-full max-w-md mx-auto">
-        <h1 className="text-2xl font-bold mb-6 text-center">
-          Add Item
-        </h1>
-        <form className="space-y-4" action={createItem}>
+        <h1 className="text-2xl font-bold mb-6 text-center">Add Item</h1>
+        <form className="space-y-4" action={onSubmit}>
           <div className="space-y-1">
             <Label htmlFor="name">Name</Label>
             <Input id="name" name="name" placeholder="Enter your name" />
           </div>
           <div className="space-y-1">
             <Label htmlFor="quantity">Quantity</Label>
-            <Input id="quantity" name="qty" placeholder="Enter quantity" type="number" />
+            <Input
+              id="quantity"
+              name="qty"
+              placeholder="Enter quantity"
+              type="number"
+            />
           </div>
           <div className="space-y-1">
             <Label htmlFor="category">Category</Label>
@@ -74,10 +61,10 @@ function CreateItem() {
                 <SelectValue placeholder="Select a category" />
               </SelectTrigger>
               <SelectContent>
-                <SelectItem value="electronics">Staples</SelectItem>
-                <SelectItem value="fashion">Ingredients</SelectItem>
-                <SelectItem value="books">Utilities</SelectItem>
-                <SelectItem value="home">Home</SelectItem>
+                <SelectItem value="Staples">Staples</SelectItem>
+                <SelectItem value="Ingredients">Ingredients</SelectItem>
+                <SelectItem value="Utilities">Utilities</SelectItem>
+                <SelectItem value="Home">Home</SelectItem>
               </SelectContent>
             </Select>
           </div>
@@ -91,62 +78,3 @@ function CreateItem() {
 }
 
 export default CreateItem;
-
-
-    // <form
-    //   className="inline-flex items-start flex-col space-y-4 border-solid border-black border-2 p-4 mt-2 w-80"
-    //   action={createItem}
-    // >
-    //   <div className="w-full">
-    //     <label htmlFor="name" className="block">
-    //       Name:
-    //     </label>
-
-    //     <input
-    //       id="name"
-    //       name="name"
-    //       type="text"
-    //       className="border-solid border-black border-2 block w-full"
-    //       required
-    //     />
-    //   </div>
-
-    //   <div className="w-full">
-    //     <label htmlFor="content" className="block">
-    //       Quantity:
-    //     </label>
-
-    //     <textarea
-    //       id="qty"
-    //       name="qty"
-    //       className="border-solid border-black border-2 block w-full"
-    //       required
-    //     />
-    //   </div>
-
-    //   <div className="w-full">
-    //     <label htmlFor="category" className="block">
-    //       Category:
-    //     </label>
-
-    //     <select
-    //       id="category"
-    //       name="category"
-    //       className="border-solid border-black border-2 block w-full"
-    //       required
-    //     >
-    //       <option value="">Select category</option>
-    //       <option value="yellow">Yellow</option>
-    //       <option value="green">Green</option>
-    //       <option value="blue">Blue</option>
-    //       <option value="purple">Purple</option>
-    //     </select>
-    //   </div>
-
-    //   <button
-    //     className="border-solid border-black border-2 py-1 px-4 hover:bg-black hover:text-white w-full"
-    //     type="submit"
-    //   >
-    //     Create Item
-    //   </button>
-    // </form>
