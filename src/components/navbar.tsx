@@ -34,7 +34,13 @@ export function Navbar() {
             </li>
           ) : (
             <li>
-              <Button onClick={() => signOut()}>Sign Out</Button>
+              <Button
+                onClick={() =>
+                  signOut({ callbackUrl: process.env.NEXT_PUBLIC_BASE_URL })
+                }
+              >
+                Sign Out
+              </Button>
             </li>
           )}
           <li>

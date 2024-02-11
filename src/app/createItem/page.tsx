@@ -13,10 +13,12 @@ import { Button } from "@/components/ui/button";
 import { createItem } from "../actions";
 import { useRouter } from "next/navigation";
 import { useToast } from "@/components/ui/use-toast";
+// import { useSession } from "next-auth/react";
 
 function CreateItem() {
   const router = useRouter();
   const { toast } = useToast();
+  // const { data: session } = useSession();
 
   async function onSubmit(formdata: FormData) {
     let res = await createItem(formdata);

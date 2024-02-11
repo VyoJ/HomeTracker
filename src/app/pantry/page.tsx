@@ -26,16 +26,18 @@ import axios from "axios";
 import { itm } from "@/@types/item";
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
+import { useSession } from "next-auth/react";
 
 export default function ItemsPage() {
   const { toast } = useToast();
+  const { data: session, status } = useSession();
   const [itms, setItems] = useState<any>([]);
   const [refresh, setRefresh] = useState<Boolean>(false);
 
   const [name, setName] = useState("");
   const [qty, setQty] = useState("");
   const [category, setCategory] = useState("");
-
+  
   async function handleDelete(id: string) {
     console.log(id);
     try {
@@ -99,8 +101,6 @@ export default function ItemsPage() {
     setRefresh(false);
   }, [refresh]);
 
-  if (!itms) return <p>No item data found</p>;
-
   return (
     <div className="mx-4">
       <div className="mt-4">
@@ -111,9 +111,9 @@ export default function ItemsPage() {
           </Button>
         </Link>
         <h2 className="my-4 text-2xl font-bold">Your Items</h2>
-
+        {!itms && <p>No item data found</p>}
         <ul className="grid grid-cols-1 lg:grid-cols-4">
-          {itms.map((itm: itm) => {
+          {itms?.map((itm: itm) => {
             return (
               <Card
                 key={itm.id}
