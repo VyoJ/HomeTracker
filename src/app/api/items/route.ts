@@ -37,7 +37,7 @@ export const PUT = async (request: NextRequest) => {
     console.log(updatedItem);
     await db
       .update(items)
-      .set(updatedItem)
+      .set(updatedItem as any)
       .where(eq(items.id, `${id}`));
     return new NextResponse("Item updated successfully", { status: 200 });
   } catch (error) {

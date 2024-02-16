@@ -7,7 +7,7 @@ import { useSession, signIn, signOut } from "next-auth/react";
 
 export function Navbar() {
   const { data: session, status } = useSession();
-  console.log(session, status);
+  console.log("Navbar:", session, status);
   return (
     <div className="border-b py-4 h-18">
       <div className="container mx-auto flex justify-between items-center">
@@ -35,9 +35,10 @@ export function Navbar() {
           ) : (
             <li>
               <Button
-                onClick={() =>
-                  signOut({ callbackUrl: process.env.NEXT_PUBLIC_BASE_URL })
-                }
+                onClick={() => {
+                  localStorage.removeItem("userid");
+                  signOut({ callbackUrl: process.env.NEXT_PUBLIC_BASE_URL });
+                }}
               >
                 Sign Out
               </Button>
