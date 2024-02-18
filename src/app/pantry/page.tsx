@@ -26,18 +26,16 @@ import axios from "axios";
 import { itm } from "@/@types/item";
 import { useEffect, useState } from "react";
 import { useToast } from "@/components/ui/use-toast";
-import { useSession } from "next-auth/react";
 
 export default function ItemsPage() {
   const { toast } = useToast();
-  const { data: session, status } = useSession();
   const [itms, setItems] = useState<any>([]);
   const [refresh, setRefresh] = useState<Boolean>(false);
 
   const [name, setName] = useState("");
   const [qty, setQty] = useState("");
   const [category, setCategory] = useState("");
-  
+
   async function handleDelete(id: string) {
     console.log(id);
     try {
@@ -90,8 +88,9 @@ export default function ItemsPage() {
   };
 
   useEffect(() => {
+    let userid = localStorage.getItem("userid");
     axios
-      .get(`${process.env.NEXT_PUBLIC_BASE_URL!}/api/items`)
+      .get(`${process.env.NEXT_PUBLIC_BASE_URL!}/api/items?id=${userid}`)
       .then((res) => {
         setItems(res.data.data);
       })

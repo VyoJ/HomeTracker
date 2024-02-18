@@ -5,8 +5,12 @@ import { itm } from "@/@types/item";
 import { eq } from "drizzle-orm";
 
 export const GET = async (request: NextRequest) => {
+  const userid: string | null = request.nextUrl.searchParams.get("id");
   try {
-    const itms: itm[] = await db.select().from(items);
+    const itms: itm[] = await db
+      .select()
+      .from(items)
+      .where(eq(items.user, `${userid}`));
     // console.log(itms);
     return new NextResponse(JSON.stringify({ data: itms }), {
       status: 200,
